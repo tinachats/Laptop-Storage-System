@@ -14,14 +14,8 @@ int ledState = LOW;
 // voltage value
 int sensorValue = 0;
 
-// set the time the screen was previously refreshed
-unsigned long previousMillis = 0;
-
 // duration between lcd refreshes
 const long interval = 1000;
-
-// the interval between led blinking states
-const long blinkInterval = 250;
 
 // buffer variables to hold values to print on the lcd
 char floatBuffer[8];
@@ -126,9 +120,6 @@ void setup() {
   // create a custom character
   lcd.createChar(5, fullBattery);
 
-  // initialize the button as an input
-  pinMode(buttonPin, INPUT);
-
   // initialize the voltage sensor as an input
   pinMode(voltageSensor, INPUT);
 
@@ -140,12 +131,6 @@ void setup() {
 }
 
 void loop() {
-  // get the current time in milliseconds
-  unsigned long currentMillis = millis();
-
-  // read the pushbutton input pin
-  buttonState = digitalRead(buttonPin);
-
   // read the value of the voltage sensor
   sensorValue = analogRead(voltageSensor); // it's between 0 and 1023
 
@@ -158,7 +143,7 @@ void loop() {
     // show the battery animation
     chargingAnimation(0, 0);
     // blink the led to show that it's charging
-    isCharging(chargingLed, ledState, previousMillis, currentMillis, blinkInterval);
+    ledBlinking(chargingLed);
   } else {
     //  show that the charger needs to be connected 
     connectCharger(0, 0, chargingLed);
@@ -182,21 +167,11 @@ void clearLCDLine(int line){
 }
 
 // blink the chargingLED to show that the device is charging
-void isCharging(int led, int ledState, unsigned long previousMillis, unsigned long currentMillis, int blinkInterval){
-  // blink the led if the difference between the previous time
-  // and the current time is greater than the blinkInterval
-  if(currentMillis - previousMillis >= blinkInterval){
-    // save the previousMillis as the currentMillis
-    previousMillis = currentMillis;
-    // check to see the ledState. If it's HIGH turn it off and vice-versa
-    if(ledState == HIGH){
-      ledState = LOW;
-    } else {
-      ledState = HIGH;
-    }
-    // set the LED with the ledState of the variable
-    digitalWrite(led, ledState);
-  }
+void ledBlinking(int led){
+  digitalWrite(led, HIGH);
+  delay(100);
+  digitalWrite(led, LOW);
+  delay(100);
 }
 
 // show that the charger is connected
